@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-
+import '../../main.dart';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:pofol_web/Profile_item/awards.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/gestures.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../Profile_item/summary_proejct.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 const maincolor=0xfffff9e9;
 
 class mainDesktop extends StatefulWidget {
@@ -36,7 +38,7 @@ class _mainDesktopState extends State<mainDesktop> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
-              Text("안녕하세요 :) Desktop",
+              Text("안녕하세요 :)",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 35,
@@ -90,7 +92,7 @@ class _mainDesktopState extends State<mainDesktop> {
                                 children: [
 
                                   Padding(padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.05),
-                                    child: Text("김민철",style: TextStyle(fontSize: 50,
+                                    child: Text(context.read<user>().user_information.header,style: TextStyle(fontSize: 50,
                                         fontWeight: FontWeight.bold),),)
                                 ],
                               ),
@@ -108,30 +110,47 @@ class _mainDesktopState extends State<mainDesktop> {
 
                                     Column(
                                       children: [
-                                        ListTile(leading: FaIcon(FontAwesomeIcons.phone,color: Colors.black,),title: Text("010-3540-2837"),
+                                        ListTile(leading: FaIcon(FontAwesomeIcons.handPaper,color: Colors.black,),title: Text("Developer"),
+
+                                        ),
+                                        ListTile(leading: FaIcon(FontAwesomeIcons.github,color: Colors.black,),title: Row(
+                                          children: [
+                                            RichText(text:
+                                            TextSpan(text: 'Git Hub',style: TextStyle(color: Colors.blue,fontSize: 17), recognizer: TapGestureRecognizer()..onTap = () async{
+                                              // Single tapped.
+                                              final url=context.read<user>().user_information.about['CONTACT']![0];
+                                              //   const uri=Uri.parse(url);
+                                              if(await canLaunch(url)){
+                                                await launch(url);
+                                              }else
+                                              {
+                                                print("안됨");
+                                              }
+                                            })
+                                            )
+
+                                          ],
+                                        )
 
                                         ),
 
-                                        ListTile(leading: FaIcon(FontAwesomeIcons.github,color: Colors.black,),title: Text("zxver1000"),
-
-                                        ),
                                         ListTile(leading: FaIcon(FontAwesomeIcons.calendar,color: Colors.black,),title: Text("1996-09-01"),)
                                       ],
                                     )
 
                                     ),
                                     Flexible(fit: FlexFit.loose,child:
-                                    Column(
-                                      children: [
-                                        ListTile(leading: FaIcon(FontAwesomeIcons.blog,color: Colors.black,),title: Text("zxver@naver.com"),
+                                    Container(
+                                      height: 150,
+                                      child: Column(
+                                        children: [
+                                          ListTile(leading: FaIcon(FontAwesomeIcons.blog,color: Colors.black,),title: Text("zxver@naver.com"),
 
-                                        ),
+                                          ),
 
-                                        ListTile(leading: FaIcon(FontAwesomeIcons.github,color: Colors.black,),title: Text("zxver1000"),
-
-                                        ),
-                                        ListTile(leading: FaIcon(FontAwesomeIcons.calendar,color: Colors.black,),title: Text("1996-09-01"),)
-                                      ],
+                                          ListTile(leading: FaIcon(FontAwesomeIcons.calendar,color: Colors.black,),title: Text("1996-09-01"),)
+                                        ],
+                                      ),
                                     )
 
                                     ),
@@ -205,6 +224,18 @@ class awards extends StatefulWidget {
 }
 
 class _awardsState extends State<awards> {
+  List<String>keys=[];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var k=context.read<user>().user_information.awards;
+    for(var next in k.keys)
+      {
+        keys.add(next);
+      }
+
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -235,7 +266,7 @@ class _awardsState extends State<awards> {
                   child: Container(
                     margin: EdgeInsets.only(top: 20),
                     color: Colors.grey[300],
-                    height: 500,
+                    height: 200.0*((context.read<user>().user_information.awards.length)/2).round(),
                     width: 5,
                   ),
                 ))
@@ -246,15 +277,15 @@ class _awardsState extends State<awards> {
             ),
             Expanded(flex: 6,child:
             Container(
-              height: 500,
+              height: 200.0*((context.read<user>().user_information.awards.length)/2).round(),
               width:  300,
               child: GridView.builder(
-                  itemCount: 5,
+                  itemCount: context.read<user>().user_information.awards.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, //1 개의 행에 보여줄 item 개수
-                    mainAxisExtent: 250,
-                    mainAxisSpacing: 30, //수평 Padding
-                    crossAxisSpacing: 30, //수직 Padding
+                    mainAxisExtent: 200,
+                    mainAxisSpacing: 20, //수평 Padding
+                    crossAxisSpacing: 20, //수직 Padding
                   ),
                   itemBuilder: (context,index){
                     return    Container(
@@ -267,7 +298,7 @@ class _awardsState extends State<awards> {
                       ),
                       child: Column(
                         children: [
-                          Text("Awards 헤커톤 금상",style: TextStyle(
+                          Text(keys[index],style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontFamily: 'hambak',
                               fontSize: 20
@@ -307,6 +338,17 @@ class introduce extends StatefulWidget {
 }
 
 class _introduceState extends State<introduce> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+   var  s=context.read<user>().user_information.about['INTRODUCTION']!.length;
+//print("여기");
+//print(s);
+  print(context.read<user>().user_information.about['INTRODUCTION']);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -336,7 +378,7 @@ class _introduceState extends State<introduce> {
                   child: Container(
                     margin: EdgeInsets.only(top: 20),
                     color: Colors.grey[300],
-                    height: 150,
+                    height: 60.0*context.read<user>().user_information.about['INTRODUCTION']!.length,
                     width: 5,
                   ),
                 ))
@@ -347,10 +389,10 @@ class _introduceState extends State<introduce> {
             ),
             Flexible(fit: FlexFit.loose,flex: 6,child:
             Container(
-              height: 150,
+              height: 50.0*context.read<user>().user_information.about['INTRODUCTION']!.length,
               child: ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 3
+                  itemCount: context.read<user>().user_information.about['INTRODUCTION']!.length
                   ,itemBuilder: (context,index){
                 return   Padding(
                   padding: const EdgeInsets.only(top: 10.0),
@@ -358,9 +400,9 @@ class _introduceState extends State<introduce> {
                     child: RichText(text:TextSpan(
                         children:
                         [
-                          TextSpan(text: '안녕하세요!! 반갑습니다 항상 긍정적으로 노력하는 개발자입니다.',
+                          TextSpan(text: context.read<user>().user_information.about['INTRODUCTION']![index],
                               style: TextStyle(
-                                  fontFamily: 'hambak',
+
                                   fontSize: 20,
                                   fontWeight: FontWeight.w300
                               )),
@@ -423,7 +465,7 @@ class _educationState extends State<education> {
                     child: Container(
                       margin: EdgeInsets.only(top: 20),
                       color: Colors.grey[300],
-                      height: 100,
+                      height: 60.0*context.read<user>().user_information.education.length,
                       width: 5,
                     ),
                   ))
@@ -433,12 +475,12 @@ class _educationState extends State<education> {
               ),
               Flexible(fit: FlexFit.loose,flex: 6,child:
               Container(
-                height: 150,
+                height: 50.0*context.read<user>().user_information.education.length,
 
 
                 child: ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 2
+                    itemCount: context.read<user>().user_information.education.length
                     ,itemBuilder: (context,index){
                   return   Padding(
                     padding: const EdgeInsets.only(top: 15.0),
@@ -448,16 +490,15 @@ class _educationState extends State<education> {
 
                             children:
                             [
-                              TextSpan(text: '건국대학교 컴퓨터공학부',
+                              TextSpan(text: context.read<user>().user_information.education['대학교'],
 
                                   style: TextStyle(
-                                    fontFamily: 'hambak',
+
                                     fontSize: 20,
                                     fontWeight: FontWeight.w300,
 
                                   )),
-                              TextSpan(text: ' 졸업'),
-                              TextSpan(text: '    (2017-02-01~2022-03-02)')
+
 
                             ]
                         )),
@@ -487,6 +528,20 @@ class techStack extends StatefulWidget {
 }
 
 class _techStackState extends State<techStack> {
+
+  List<String>key_list=[];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    for(var key in context.read<user>().user_information.skill.keys)
+      {
+        key_list.add(key);
+      }
+   // print(key_list);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -517,7 +572,7 @@ class _techStackState extends State<techStack> {
                   child: Container(
                     margin: EdgeInsets.only(top: 20),
                     color: Colors.grey[300],
-                    height: 500,
+                    height: 250.0*((context.read<user>().user_information.skill.length/2).round()),
                     width: 5,
                   ),
                 ))
@@ -528,9 +583,9 @@ class _techStackState extends State<techStack> {
             ),
             Expanded(flex: 6,child:
             Container(
-              height: 520,
+              height: 260.0*(context.read<user>().user_information.skill.length/2).round(),
               child: GridView.builder(
-                  itemCount: 4,
+                  itemCount: context.read<user>().user_information.skill.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, //1 개의 행에 보여줄 item 개수
                     mainAxisExtent: 250,
@@ -540,15 +595,24 @@ class _techStackState extends State<techStack> {
                   itemBuilder: (context,index){
                     return    Column(
                       children: [
-                        ListTile(leading: Text(""),title: Text("Android",style: TextStyle(
+                        ListTile(leading: Text(""),title: Text(key_list[index].toString(),style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontFamily: 'hambak',
                             fontSize: 20
 
                         ),),),
-                        ListTile(leading:Icon(Icons.check),title: Text("Kotlin"),),
-                        ListTile(leading:Icon(Icons.check),title: Text("Kubernetes"),),
-                        ListTile(leading:Icon(Icons.check),title: Text("Kubernetes"),),
+
+                        Container(
+                          height: context.read<user>().user_information.skill[key_list[index]]!.length*60.0,
+                          child: ListView.builder(
+                          itemCount: context.read<user>().user_information.skill[key_list[index]]!.length
+                          ,itemBuilder: (context,indexs){
+                            return  ListTile(leading:Icon(Icons.check),title: Text(context.read<user>().user_information.skill[key_list[index]]![indexs].toString()),);
+
+                          }),
+                        )
+
+
 
                       ],
                     )

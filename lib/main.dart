@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:pofol_web/Desktop_ui.dart';
 import 'package:pofol_web/mobile_ui.dart';
 import 'package:provider/provider.dart';
+import 'home.dart';
 import 'package:flutter/services.dart';
 import './Pad_ui.dart';
 import 'ui_version2.dart';
@@ -22,23 +23,42 @@ class user_info{
   List<String>contact=[];
   Map<String,List<String>>skill={};
   Map<String,String>awards={};
-  Map<String,List<String>>education={};
+  Map<String,String>education={};
+  Map<String,List<String>>about={};
 
   user_info(this.header);
 }
+
+class project_info{
+  var proejct_Role;
+  var proejct_Preview;
+  Map<String,List<String>>project_Detail={};
+}
+
 class user extends ChangeNotifier{
   var user_information=user_info("22");
 
-  void set_userinfo(header,introduce,contact,skill,awards,education){
+  void set_userinfo(var header,var about,var skill,var awards,var education){
     user_information.header=header;
-    user_information.introduction=introduce;
-    user_information.contact=contact;
+    user_information.about=about;
     user_information.skill=skill;
     user_information.awards=awards;
     user_information.education=education;
+    notifyListeners();
   }
 
 }
+class project_list extends ChangeNotifier{
+  List<project_info> project_array=[];
+
+  void set_project(var proejct_list){
+    project_array.add(proejct_list);
+    notifyListeners();
+  }
+
+
+}
+
 
 class server extends ChangeNotifier{
   var http_server_name;
@@ -52,6 +72,7 @@ void main() {
       MultiProvider(providers: [
         ChangeNotifierProvider(create: (c)=>server()),
         ChangeNotifierProvider(create: (c)=>user()),
+        ChangeNotifierProvider(create: (c)=>project_list()),
       ],
         child: MyApp(),)
   );
@@ -87,95 +108,6 @@ class _mainScreenState extends State<mainScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setserver();
-  }
-
-  void setserver() async{
-    String json=await rootBundle.loadString('assets/server.json');
-    final jsonResponse = jsonDecode(json);
-    context.read<server>().setserver(jsonResponse['server']);
-    print("서버완료");
-    var server_url="http://"+context.read<server>().http_server_name+"page/welcome";
-    print(server_url);
-    Uri uri = Uri.parse(server_url);
-    Map<String, String> headers = {'Content-Type': 'application/json'};
-    //서버 data 셋팅
-    var res = await http.get(uri, headers: headers);
-    if(res.statusCode==200)
-      {
-       // print("zd");
-        var datas = utf8.decode(res.bodyBytes);
-        //print(datas);
-
-        var sd = jsonDecode(datas);
-        //print(sd['data'][0]);
-        var header=sd['data'][0]['HEADER'];
-        Map<String,List<String>>introduction={};
-        List<String>abouts=[];
-        List<String>contact=[];
-        //print(sd['data'][0]['ABOUT_ME']);
-        for(var next1 in sd['data'][0]['ABOUT_ME'].keys)
-          {
-            abouts.clear();
-         for(var next2 in sd['data'][0]['ABOUT_ME'][next1])
-         {
-          // print(next2);
-           abouts.add(next2);
-         }
-         introduction[next1]=abouts;
-
-
-          }
-
-        Map<String,List<String>>skill={};
-        for(var next1 in sd['data'][0]['SKILLS'].keys)
-        {
-          abouts.clear();
-          for(var next2 in sd['data'][0]['SKILLS'][next1])
-          {
-            // print(next2);
-            abouts.add(next2);
-          }
-          skill[next1]=abouts;
-
-
-        }
-       print(skill);
-
-        Map<String,String>awards={};
-        //print(sd['data'][0]['AWARDS'][0]);
-        for(var next1 in sd['data'][0]['AWARDS'])
-          {
-            for(var next2 in next1.keys)
-              {
-                awards[next2]=next1[next2];
-              }
-
-          }
-
-
-        Map<String,String>Education={};
-        //print(sd['data'][0]['EDUCATION']);
-        Education['대학교']=sd['data'][0]['EDUCATION']['대학교'];
-        /*
-        for(var next1 in sd['data'][0]['EDUCATION'])
-        {
-          print(next1);
-          for(var next2 in next1.keys)
-          {
-            print("sd");
-            print(next2);
-            Education[next2]=next1[next2];
-          }
-
-        }
-         */
-        print(Education);
-      }
-    else
-      {
-        print("서버 읽어들이기 실패");
-      }
 
   }
 
@@ -184,23 +116,7 @@ class _mainScreenState extends State<mainScreen> {
   Widget build(BuildContext context) {
 
     var currentwidth=MediaQuery.of(context).size.width;
-    return LayoutBuilder(builder: (context,constraints){
-      if(constraints.maxWidth<700){
-        return mainMobile();
 
-      }
-      else if(constraints.maxWidth<1000&& constraints.maxWidth>455)
-      {
-        print(constraints.maxWidth);
-        return mainPad();
-      }
-
-      else
-        {
-          return mainDesktop();
-        }
-
-    }
-    );
+    return home();
   }
 }

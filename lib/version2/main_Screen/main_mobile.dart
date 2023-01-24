@@ -6,12 +6,13 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:pofol_web/Profile_item/awards.dart';
 import 'package:provider/provider.dart';
+import '../../main.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 const maincolor=0xfffff9e9;
-
 
 
 class mainMobile extends StatefulWidget {
@@ -25,6 +26,12 @@ class _mainMobileState extends State<mainMobile> {
 
   final double topWidgetHeight = 250.0;
   final double avatarRadius = 50.0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +45,7 @@ class _mainMobileState extends State<mainMobile> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
-              Text("안녕하세요 :) Mobile",
+              Text("안녕하세요 :)",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 35,
@@ -81,7 +88,6 @@ class _mainMobileState extends State<mainMobile> {
                         height: topWidgetHeight*1.7,
                         width: MediaQuery.of(context).size.width,
 
-
                         child:
                         Container(
                           child: Column(
@@ -92,7 +98,7 @@ class _mainMobileState extends State<mainMobile> {
                                 children: [
 
                                   Padding(padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.05),
-                                    child: Text("김민철",style: TextStyle(fontSize: 45,
+                                    child: Text(context.read<user>().user_information.header,style: TextStyle(fontSize: 45,
                                         fontWeight: FontWeight.bold),),)
                                 ],
                               ),
@@ -114,7 +120,24 @@ class _mainMobileState extends State<mainMobile> {
 
                                         ),
 
-                                        ListTile(leading: FaIcon(FontAwesomeIcons.github,color: Colors.black,),title: Text("zxver1000"),
+                                        ListTile(leading: FaIcon(FontAwesomeIcons.github,color: Colors.black,),title: Row(
+                                          children: [
+                                            RichText(text:
+                                            TextSpan(text: 'Git Hub',style: TextStyle(color: Colors.blue,fontSize: 17), recognizer: TapGestureRecognizer()..onTap = () async{
+                                              // Single tapped.
+                                              final url=context.read<user>().user_information.about['CONTACT']![0];
+                                              //   const uri=Uri.parse(url);
+                                              if(await canLaunch(url)){
+                                                await launch(url);
+                                              }else
+                                              {
+                                                print("안됨");
+                                              }
+                                            })
+                                            )
+
+                                          ],
+                                        )
 
                                         ),
                                         ListTile(leading: FaIcon(FontAwesomeIcons.calendar,color: Colors.black,),title: Text("1996-09-01"),),
@@ -144,8 +167,6 @@ class _mainMobileState extends State<mainMobile> {
 
 
 
-                      Padding(padding: EdgeInsets.only(top: 50),
-                        child: Text(""),),
                       introduce(),
                       Padding(padding: EdgeInsets.only(top: 50), child: Text(""),),
                       education(),
@@ -197,12 +218,26 @@ class awards extends StatefulWidget {
 }
 
 class _awardsState extends State<awards> {
+
+  List<String>keys=[];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var k=context.read<user>().user_information.awards;
+    for(var next in k.keys)
+    {
+      keys.add(next);
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding:  EdgeInsets.only(left: MediaQuery.of(context).size.width*0.05),
       child: Container(
-        width: MediaQuery.of(context).size.width*0.9,
+        width: MediaQuery.of(context).size.width*0.85,
 
 
         child: Column(
@@ -223,14 +258,15 @@ class _awardsState extends State<awards> {
             ),
             Divider(height: 20,color: Colors.grey[500],),
             Container(
-              height: 500,
+              height: 200.0*((context.read<user>().user_information.awards.length)/2).round(),
+              width:  400,
               child: GridView.builder(
-                  itemCount: 5,
+                  itemCount: context.read<user>().user_information.awards.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, //1 개의 행에 보여줄 item 개수
-                    mainAxisExtent: 250,
-                    mainAxisSpacing: 30, //수평 Padding
-                    crossAxisSpacing: 30, //수직 Padding
+                    mainAxisExtent: 200,
+                    mainAxisSpacing: 20, //수평 Padding
+                    crossAxisSpacing: 20, //수직 Padding
                   ),
                   itemBuilder: (context,index){
                     return    Container(
@@ -239,11 +275,10 @@ class _awardsState extends State<awards> {
                             color: Colors.grey,
                             width: 1
                         ),
-
                       ),
                       child: Column(
                         children: [
-                          Text("Awards 헤커톤 금상",style: TextStyle(
+                          Text(keys[index],style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontFamily: 'hambak',
                               fontSize: 20
@@ -259,8 +294,7 @@ class _awardsState extends State<awards> {
                     )
                     ;
 
-                  })
-              ,
+                  }),
             )
           ],
         )
@@ -285,7 +319,7 @@ class _introduceState extends State<introduce> {
     return Padding(
       padding:  EdgeInsets.only(left: MediaQuery.of(context).size.width*0.05),
       child: Container(
-        width: MediaQuery.of(context).size.width*0.9,
+        width: MediaQuery.of(context).size.width*0.85,
 
         child: Column(
 
@@ -296,7 +330,7 @@ class _introduceState extends State<introduce> {
                 FaIcon(FontAwesomeIcons.handPointRight,size: 45,),
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
-                  child: Text("Introduce",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,
+                  child: Text("Introduction",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,
                       fontFamily: 'hambak',
                       color: Colors.blue[500]
                   ),),
@@ -305,22 +339,33 @@ class _introduceState extends State<introduce> {
             ),
             Divider(height: 20,color: Colors.grey[500],),
 
-            Padding(padding: EdgeInsets.only(top: 20),
-              child: RichText(text:TextSpan(
-                  children:
-                  [
-                    TextSpan(text: '안녕하세요!! 반갑습니다 항상 긍정적으로 노력하는 개발자입니다.',
-                        style: TextStyle(
+            Container(
+              height: 50.0*context.read<user>().user_information.about['INTRODUCTION']!.length,
+              child: ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: context.read<user>().user_information.about['INTRODUCTION']!.length
+                  ,itemBuilder: (context,index){
+                return   Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Container(
+                    child: RichText(
+                     textAlign: TextAlign.center
+                    ,text:TextSpan(
+                        children:
+                        [
+                          TextSpan(text: context.read<user>().user_information.about['INTRODUCTION']![index],
+                              style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w300
+                              )),
 
-                            fontSize: 17,
-                            fontWeight: FontWeight.w300
-                        )),
+                        ]
+                    )),
+                  ),
+                );
 
-
-                  ]
-              ))
-              ,)
-
+              }),
+            )
 
           ],
         )
@@ -346,7 +391,7 @@ class _educationState extends State<education> {
       Padding(
         padding:  EdgeInsets.only(left: MediaQuery.of(context).size.width*0.05),
         child: Container(
-          width: MediaQuery.of(context).size.width*0.9,
+          width: MediaQuery.of(context).size.width*0.85,
 
           child: Column(
 
@@ -368,35 +413,37 @@ class _educationState extends State<education> {
 
 
               Container(
-                height: 200,
-                child:  ListView.builder(
+                height: 50.0*context.read<user>().user_information.education.length,
+
+
+                child: ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 2
+                    itemCount: context.read<user>().user_information.education.length
                     ,itemBuilder: (context,index){
-                  return  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(padding: EdgeInsets.only(top: 20),
-                        child: RichText(text:TextSpan(
+                  return   Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: RichText(
+                        textAlign: TextAlign.center,
+                        text:TextSpan(
+
                             children:
                             [
-                              TextSpan(text: '건국대학교 컴퓨터공학부 ',
+                              TextSpan(text: context.read<user>().user_information.education['대학교'],
+
                                   style: TextStyle(
 
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w300
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w300,
+
                                   )),
-                              TextSpan(text: '졸업'),
-                              TextSpan(text: '(2015.02~2020.02)')
 
 
                             ]
-                        ))
-                        ,),
-                    ],
+                        )),
+
                   );
-                })
-                ,
+
+                }),
               )
 
 
@@ -417,12 +464,25 @@ class techStack extends StatefulWidget {
 }
 
 class _techStackState extends State<techStack> {
+  List<String>key_list=[];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    for(var key in context.read<user>().user_information.skill.keys)
+    {
+      key_list.add(key);
+    }
+    // print(key_list);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding:  EdgeInsets.only(left: MediaQuery.of(context).size.width*0.05),
       child: Container(
-        width: MediaQuery.of(context).size.width*0.9,
+        width: MediaQuery.of(context).size.width*0.85,
 
 
         child: Column(
@@ -445,34 +505,42 @@ class _techStackState extends State<techStack> {
             Divider(height: 20,color: Colors.grey[500],),
 
             Container(
-              height: 500,
+              height: 260.0*(context.read<user>().user_information.skill.length/2),
               child: GridView.builder(
-                  itemCount: 4,
+                  itemCount: context.read<user>().user_information.skill.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, //1 개의 행에 보여줄 item 개수
-                    mainAxisExtent: 230,
+                    mainAxisExtent: 250,
                     mainAxisSpacing: 10, //수평 Padding
                     crossAxisSpacing: 10, //수직 Padding
                   ),
                   itemBuilder: (context,index){
                     return    Column(
                       children: [
-                        ListTile(leading: Text(""),title: Text("Android",style: TextStyle(
+                        ListTile(leading: Text(""),title: Text(key_list[index].toString(),style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontFamily: 'hambak',
-                            fontSize: 20
+                            fontSize: 17
 
                         ),),),
-                        ListTile(leading:Icon(Icons.check),title: Text("Kotlin"),),
-                        ListTile(leading:Icon(Icons.check),title: Text("Kubernetes"),),
-                        ListTile(leading:Icon(Icons.check),title: Text("Kubernetes"),),
+
+                        Container(
+                          height: context.read<user>().user_information.skill[key_list[index]]!.length*60.0,
+                          child: ListView.builder(
+                              itemCount: context.read<user>().user_information.skill[key_list[index]]!.length
+                              ,itemBuilder: (context,indexs){
+                            return  ListTile(leading:Icon(Icons.check),title: Text(context.read<user>().user_information.skill[key_list[index]]![indexs].toString()),);
+
+                          }),
+                        )
+
+
 
                       ],
                     )
                     ;
 
-                  })
-              ,
+                  }),
             )
 
 
@@ -520,7 +588,7 @@ class _summary_projectState extends State<summary_project> {
   Widget build(BuildContext context) {
     return
       Padding(
-        padding: const EdgeInsets.only(top: 5.0),
+        padding: const EdgeInsets.only(top: 15.0),
         child: Column(
           children: [
             Container(
@@ -550,9 +618,10 @@ class _summary_projectState extends State<summary_project> {
             ),
 
             Container(
-              margin: EdgeInsets.all(10),
+              margin: EdgeInsets.all(30),
               padding: EdgeInsets.only(top: 40),
               width: MediaQuery.of(context).size.width*widget.percent,
+              height: 680,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
                   color: Colors.white,
@@ -564,7 +633,6 @@ class _summary_projectState extends State<summary_project> {
                   )]
               )
               ,
-
               child: Column(
 
                 children: [
@@ -575,7 +643,7 @@ class _summary_projectState extends State<summary_project> {
                       carouselController: buttonCarouselController
                       ,items: ss, options: CarouselOptions(
                     autoPlay: false,
-                    height: 750,
+                    height: 623,
                     enlargeCenterPage: true,
                     viewportFraction: 0.98,
                     initialPage: 3,
@@ -610,7 +678,7 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
     return Container(
 
       width: MediaQuery.of(context).size.width*percents,
-      height: 1900,
+
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -619,7 +687,7 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
             width: MediaQuery.of(context).size.width*0.03,
             child: Row(
 
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment. center,
               children: [
 
                 InkWell(
@@ -636,7 +704,7 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
           ,
 
           Flexible(fit: FlexFit.tight,child:  Container(
-            height: 1800,
+
             child: Column(
               children: [
 
@@ -674,71 +742,29 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
                   child: Column(
                     children: [
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text("Role : ",textAlign: TextAlign.start,style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16
-                          ),),
-                          Text(" Project Manager")
-                        ],
-                      ),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text("Tech Stack : ",textAlign: TextAlign.start,style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16
-                          ),),
-                          Text(" AWS,Flutter,node js")
-                        ],
-                      ),
-                      Padding(padding: EdgeInsets.only(top: 20),
-                        child: Divider(color: Colors.grey[400],height: 1,),),
 
 
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: RichText(text:TextSpan(
-                            children:
-                            [
-                              TextSpan(text: '일반적인 음악 스트리밍 서비스에 가사, 단어를 통한 감정 분석, 음악 추천을 해주는 서비스일반적인 음악 스트리밍 서비스에 가사, 단어를 통한 감정 분석, 음악 추천을 해주는 서비스일반적인 음악 스트리밍 서비스에 가사, 단어를 통한 감정 분석, 음악 추천을 해주는 서비스',
-                                  style: TextStyle(
-                                      fontFamily: 'hambak',
-                                      fontSize: font_size,
-                                      fontWeight: FontWeight.w400
-                                  )),
+                    Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: CarouselSlider(
 
+                          carouselController: buttonCarouselController
+                          ,items: [
+                        Image.asset('assets/image/cloud.png',
+                            fit: BoxFit.fill)
+                        , Image.asset('assets/image/cloud.png',
+                            fit: BoxFit.fill),
+                       Text("12")
+                      ], options: CarouselOptions(
+                        autoPlay: false,
+                        height: 200,
+                        enlargeCenterPage: true,
+                        viewportFraction: 0.98,
+                        initialPage: 3,
 
-                            ]
-                        )),
-                      ),
-
-                      Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: CarouselSlider(
-
-                            carouselController: buttonCarouselController
-                            ,items: [
-                          Image.asset('assets/image/cloud.png',
-                              fit: BoxFit.fill)
-                          , Image.asset('assets/image/cloud.png',
-                              fit: BoxFit.fill),
-                          Text("1"),Text("2")
-                        ], options: CarouselOptions(
-                          autoPlay: false,
-                          height: 330,
-                          enlargeCenterPage: true,
-                          viewportFraction: 0.98,
-                          initialPage: 3,
-
-
-                        )),
-                      )
-,
-                      Padding(
+                      )),
+                    )
+                      ,  Padding(
                         padding: EdgeInsets.only(top:5.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,children: [
@@ -767,6 +793,51 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
                         ],),
                       ),
 
+            Padding(padding: EdgeInsets.only(top: 20)),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text("Role : ",textAlign: TextAlign.start,style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16
+                          ),),
+                          Text(" Project Manager")
+                        ],
+                      ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text("Tech Stack : ",textAlign: TextAlign.start,style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16
+                          ),),
+                          Text(" AWS,Flutter,node js")
+                        ],
+                      ),
+                      Padding(padding: EdgeInsets.only(top: 20),
+                        child: Divider(color: Colors.grey[400],height: 1,),),
+
+
+                       Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: RichText(text:TextSpan(
+                              children:
+                              [
+                                TextSpan(text: '일반적인 음악 스트리밍 서비스에 가사, 단어를 통한 감정 분석, 음악 추천을 해주는 서비스',
+                                    style: TextStyle(
+                                        fontSize:  14 ,
+                                        fontWeight: FontWeight.w400
+                                    )),
+
+
+                              ]
+                          )),
+                        ),
+
+
+
                     ],
                   ),
 
@@ -779,6 +850,7 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
           ,
           Container(
             width: MediaQuery.of(context).size.width*0.03,
+            height: 20,
             child: Row(
 
               mainAxisAlignment: MainAxisAlignment.end,
