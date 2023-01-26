@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:pofol_web/Profile_item/awards.dart';
 import 'package:provider/provider.dart';
 import '../../main.dart';
+import '../DetailProject/detail_home.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/gestures.dart';
@@ -38,7 +39,7 @@ class _mainMobileState extends State<mainMobile> {
     return Scaffold(
 
       appBar: AppBar(
-        toolbarHeight: 120,
+        toolbarHeight: 100,
         flexibleSpace: Container(
           child:
           Column(
@@ -98,7 +99,7 @@ class _mainMobileState extends State<mainMobile> {
                                 children: [
 
                                   Padding(padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.05),
-                                    child: Text(context.read<user>().user_information.header,style: TextStyle(fontSize: 45,
+                                    child: Text(context.read<user>().user_information.header,style: TextStyle(fontSize: 38,
                                         fontWeight: FontWeight.bold),),)
                                 ],
                               ),
@@ -197,7 +198,7 @@ class _mainMobileState extends State<mainMobile> {
                     ),
 
                     right: MediaQuery.of(context).size.width*0.09,
-                    top: avatarRadius+50,
+                    top: avatarRadius+30,
                   )
                 ],
               ),
@@ -712,7 +713,10 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
                   cursor: SystemMouseCursors.click,
                   child:TextButton(
                       onPressed: (){
-                        print("@");
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return detailHome();
+                            }));
                       },
                       child: Text("AWS Project",style: TextStyle(
                           fontWeight: FontWeight.bold,

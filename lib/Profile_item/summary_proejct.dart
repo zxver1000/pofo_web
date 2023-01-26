@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
+import '../version2/DetailProject/detail_home.dart';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:async';
@@ -169,7 +170,10 @@ class _proejct_item_miniState extends State<proejct_item_mini> {
                 cursor: SystemMouseCursors.click,
                 child:TextButton(
                   onPressed: (){
-                    print("@");
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                          return detailHome();
+                        }));
                   },
                   child: Text("AWS Project",style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -223,8 +227,7 @@ fit: FlexFit.tight,
                   ,items: [
                      Image.asset('assets/image/cloud.png',
                   fit: BoxFit.fill)
-                  , Image.asset('assets/image/cloud.png',
-                  fit: BoxFit.fill),
+                  , Image.network('http://3.34.117.122:3080/img/jpg/2017_samsung.jpg',fit: BoxFit.fill,),
                     Text("1"),Text("2")
               ], options: CarouselOptions(
                 autoPlay: false,

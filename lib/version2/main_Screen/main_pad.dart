@@ -341,6 +341,7 @@ class _introduceState extends State<introduce> {
             ),
             Divider(height: 20,color: Colors.grey[500],),
 
+            Image.network('http://3.34.117.122:3080/img/jpg/2017_samsung.jpg'),
             Container(
               height: 50.0*context.read<user>().user_information.about['INTRODUCTION']!.length,
               child: ListView.builder(

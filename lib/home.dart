@@ -39,7 +39,7 @@ class _homeState extends State<home> {
     final jsonResponse = jsonDecode(json);
     context.read<server>().setserver(jsonResponse['server']);
     print("서버완료");
-    var server_url = "http://" + context.read<server>().http_server_name + "page/welcome";
+    var server_url = "http://" + context.read<server>().http_server_name + "api/page/welcome";
     print(server_url);
     Uri uri = Uri.parse(server_url);
     Map<String, String> headers = {'Content-Type': 'application/json'};

@@ -15,8 +15,21 @@ import 'version2/main_Screen/main_desktop.dart';
 import 'version2/main_Screen/main_mobile.dart';
 
 import 'dart:convert';
+import 'dart:io';
 import 'version2/main_Screen/main_pad.dart';
+class ProxiedHttpOverrides extends HttpOverrides {
+  String _proxy;
+  ProxiedHttpOverrides(this. _proxy);
 
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    return super.createHttpClient(context)
+      ..findProxy = (uri) {
+        return _proxy.isNotEmpty ? "PROXY $_proxy;" : 'DIRECT';
+      }
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => Platform.isAndroid;
+  }
+}
 class user_info{
   var header;
   List<String>introduction=[];
